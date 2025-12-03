@@ -25,17 +25,20 @@ class DeliveryCardTest {
         $("[data-test-id=city] input").setValue("Москва");
         $("[data-test-id=date] input").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE)
                 .setValue(planningDate);
-        $("[data-test-id=name] input").setValue("Иванов Иван");
+        $("[data-test-id=name] input").setValue("Степанов Степан");
         $("[data-test-id=phone] input").setValue("+71234567890");
         $("[data-test-id=agreement]").click();
         $$("button").find(Condition.text("Забронировать")).click();
-        $("[data-test-id=notification]").should(Condition.visible, Duration.ofSeconds(15))
-                .should(Condition.text("04.12.2025"));//"04.12.2025" = текущая дата + количество days(5) класса generateDate
+        $("[data-test-id=notification]")
+                .should(Condition.visible, Duration.ofSeconds(15))
+                .should(Condition.text("Встреча успешно забронирована на "))
+                .find(planningDate);
     }
 
     @Test
     void shouldCardDeliveryBeSuccessfullyByLists() {
         Selenide.open("http://localhost:9999");
+        String planningDate = generateDate(7, "dd.MM.yyyy");
         $("[data-test-id=city] input").setValue("Се");
         $$(".menu-item").find(Condition.text("Севастополь")).click();
         $("[data-test-id=date] input").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
@@ -44,8 +47,10 @@ class DeliveryCardTest {
         $$("[data-test-id=name] input").find(Condition.visible).setValue("Иванов Иван");
         $$("[data-test-id=phone] input").find(Condition.visible).setValue("+71234567890");
         $("[data-test-id=agreement]").click();
-        $$("button").filter(Condition.visible).find(Condition.text("Забронировать")).click();
+        $$("button").find(Condition.text("Забронировать")).click();
         $("[data-test-id=notification]")
-                .should(Condition.text("06.12.2025"), Duration.ofSeconds(15));
+                .should(Condition.visible, Duration.ofSeconds(15))
+                .shouldHave(Condition.text("Встреча успешно забронирована на "))
+                .find(planningDate);
     }
 }
