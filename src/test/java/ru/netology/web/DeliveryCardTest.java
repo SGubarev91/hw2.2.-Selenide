@@ -8,6 +8,7 @@ import org.openqa.selenium.Keys;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
@@ -31,26 +32,33 @@ class DeliveryCardTest {
         $$("button").find(Condition.text("Забронировать")).click();
         $("[data-test-id=notification]")
                 .should(Condition.visible, Duration.ofSeconds(15))
-                .should(Condition.text("Встреча успешно забронирована на "))
-                .find(planningDate);
+                .should(Condition.text("Успешно!"))
+                .should(Condition.text("Встреча успешно забронирована на " + planningDate));
     }
 
     @Test
     void shouldCardDeliveryBeSuccessfullyByLists() {
         Selenide.open("http://localhost:9999");
         String planningDate = generateDate(7, "dd.MM.yyyy");
+        String planningDay = generateDate(7, "d");
+        String minVolidtMonth = generateDate(3, "MMM");
+        String planningMonth = generateDate(7, "MMM");
         $("[data-test-id=city] input").setValue("Се");
         $$(".menu-item").find(Condition.text("Севастополь")).click();
         $("[data-test-id=date] input").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-        $("button").find(".icon_name_calendar").click();
-        $$("[data-day]").get(4).click();
+        $("button").click();
+        if (!Objects.equals(minVolidtMonth, planningMonth))
+            {
+            $("[data-step='1']").click();
+            }
+        $$(".calendar__day").find(Condition.text(planningDay)).click();
         $$("[data-test-id=name] input").find(Condition.visible).setValue("Иванов Иван");
         $$("[data-test-id=phone] input").find(Condition.visible).setValue("+71234567890");
         $("[data-test-id=agreement]").click();
         $$("button").find(Condition.text("Забронировать")).click();
         $("[data-test-id=notification]")
                 .should(Condition.visible, Duration.ofSeconds(15))
-                .shouldHave(Condition.text("Встреча успешно забронирована на "))
-                .find(planningDate);
+                .should(Condition.text("Успешно!"))
+                .should(Condition.text("Встреча успешно забронирована на " + planningDate));
     }
 }
